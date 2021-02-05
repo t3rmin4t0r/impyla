@@ -28,7 +28,7 @@ from impala.util import warn_deprecate, warn_protocol_param
 import impala.hiveserver2 as hs2
 
 
-AUTH_MECHANISMS = ['NOSASL', 'PLAIN', 'GSSAPI', 'LDAP']
+AUTH_MECHANISMS = ['NOSASL', 'PLAIN', 'GSSAPI', 'LDAP', 'BEARER']
 
 
 # PEP 249 module globals
@@ -67,11 +67,11 @@ def connect(host='localhost', port=21050, database=None, timeout=None,
         Local path to the the third-party CA certificate. If SSL is enabled but
         the certificate is not specified, the server certificate will not be
         validated.
-    auth_mechanism : {'NOSASL', 'PLAIN', 'GSSAPI', 'LDAP'}
+    auth_mechanism : {'NOSASL', 'PLAIN', 'GSSAPI', 'LDAP', 'BEARER'}
         Specify the authentication mechanism. `'NOSASL'` for unsecured Impala.
         `'PLAIN'` for unsecured Hive (because Hive requires the SASL
-        transport). `'GSSAPI'` for Kerberos and `'LDAP'` for Kerberos with
-        LDAP.
+        transport). `'GSSAPI'` for Kerberos, `'LDAP'` for Kerberos with
+        LDAP, `'BEARER'` for Bearer token.
     user : str, optional
         LDAP user, if applicable.
     password : str, optional
@@ -94,7 +94,7 @@ def connect(host='localhost', port=21050, database=None, timeout=None,
         Impala and Hive.
         If 'auth_cookie_names' is explicitly set to an empty value (None, [], or ''),
         Impyla won't attempt to do cookie based authentication.
-        Currently cookie-based authentication is only supported for GSSAPI over http.
+        Currently cookie-based authentication is only supported for GSSAPI or BEARER over http.
 
         .. deprecated:: 0.11.0
     ldap_user : str, optional

@@ -419,6 +419,22 @@ def get_http_transport(host, port, http_path, timeout=None, use_ssl=False,
                 return {"Authorization": "Negotiate " + negotiate_details}
 
         transport.setGetCustomHeadersFunc(get_auth_headers)
+    elif auth_mechanism == 'BEARER':
+        def get_auth_headers(auth_cookie):
+            if auth_cookie:
+                cookie_value = auth_cookie.output(attrs=['value'], header='' ).strip()
+                return {'Cookie' : cookie_value} #TODO: client-id header
+            else:
+                import jks
+                from os import getenv
+                jceks = getenv("JWT_TOKEN_CACHE", "/run/jwt-store.jks")
+                # TODO: passphrase (krb5 has no passphrase)
+                keystore = jks.KeyStore.load(jceks, '')
+                # different keys for different hosts?
+                token = keystore.secret_keys["jwt"].key.decode()
+                log.debug('get_http_transport: token=%s', token)
+                return {"Authorization": ("Bearer %s" % token)};
+        transport.setGetCustomHeadersFunc(get_auth_headers)
 
     return transport
 
@@ -431,6 +447,7 @@ def get_transport(socket, host, kerberos_service_name, auth_mechanism='NOSASL',
     - None or 'NOSASL' - returns simple buffered transport (default)
     - 'PLAIN'  - returns a SASL transport with the PLAIN mechanism
     - 'GSSAPI' - returns a SASL transport with the GSSAPI mechanism
+    - 'BEARER' - not supported for SASL yet
     """
     log.debug('get_transport: socket=%s host=%s kerberos_service_name=%s '
               'auth_mechanism=%s user=%s password=fuggetaboutit', socket, host,

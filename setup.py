@@ -49,6 +49,7 @@ setup(
         "kerberos": ["thrift_sasl==0.4.2",
                      "kerberos>=1.3.0",
                     ],
+		"cdw" : ["pyjks==20.0.0"]
     },
     keywords=('cloudera impala python hadoop sql hdfs mpp spark pydata '
               'pandas distributed db api pep 249 hive hiveserver2 hs2'),
